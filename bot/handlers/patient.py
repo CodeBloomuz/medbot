@@ -43,9 +43,8 @@ async def start_booking(callback: CallbackQuery, state: FSMContext):
         return
 
     await callback.message.edit_text(
-        "👨‍⚕️ *Shifokorni tanlang:*",
+        "👨‍⚕️ Shifokorni tanlang:",
         reply_markup=doctors_keyboard(doctors),
-        parse_mode="Markdown"
     )
     await state.set_state(BookingState.choosing_doctor)
 
@@ -65,18 +64,16 @@ async def doctor_chosen(callback: CallbackQuery, state: FSMContext):
 
     if not available_dates:
         await callback.message.edit_text(
-            f"😔 *{doctor.name}* uchun hozircha bo'sh kunlar yo'q.\n"
+            f"😔 {doctor.name} uchun hozircha bo'sh kunlar yo'q.\n"
             f"Boshqa shifokorni tanlang yoki keyinroq urinib ko'ring.",
             reply_markup=main_menu_keyboard(),
-            parse_mode="Markdown"
         )
         return
 
     await callback.message.edit_text(
-        f"✅ Shifokor: *{doctor.name}* ({doctor.specialty})\n\n"
-        f"📅 *Qulay kunni tanlang:*",
+        f"✅ Shifokor: {doctor.name} ({doctor.specialty})\n\n"
+        f"📅 Qulay kunni tanlang:",
         reply_markup=dates_keyboard(available_dates),
-        parse_mode="Markdown"
     )
     await state.set_state(BookingState.choosing_date)
 
@@ -85,9 +82,8 @@ async def doctor_chosen(callback: CallbackQuery, state: FSMContext):
 async def back_to_doctors(callback: CallbackQuery, state: FSMContext):
     doctors = await get_all_doctors()
     await callback.message.edit_text(
-        "👨‍⚕️ *Shifokorni tanlang:*",
+        "👨‍⚕️ Shifokorni tanlang:",
         reply_markup=doctors_keyboard(doctors),
-        parse_mode="Markdown"
     )
     await state.set_state(BookingState.choosing_doctor)
 
@@ -112,9 +108,8 @@ async def date_chosen(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
         f"📅 Sana: *{chosen_date.day}.{chosen_date.month:02d}.{chosen_date.year}* "
         f"({day_names.get(chosen_date.isoweekday(), '')})\n\n"
-        f"🕐 *Qulay vaqtni tanlang:*",
+        f"🕐 Qulay vaqtni tanlang:",
         reply_markup=times_keyboard(slots),
-        parse_mode="Markdown"
     )
     await state.set_state(BookingState.choosing_time)
 
@@ -124,9 +119,8 @@ async def back_to_dates(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     available_dates = await get_available_dates(data["doctor_id"])
     await callback.message.edit_text(
-        "📅 *Qulay kunni tanlang:*",
+        "📅 Qulay kunni tanlang:",
         reply_markup=dates_keyboard(available_dates),
-        parse_mode="Markdown"
     )
     await state.set_state(BookingState.choosing_date)
 
@@ -137,9 +131,8 @@ async def time_chosen(callback: CallbackQuery, state: FSMContext):
     await state.update_data(chosen_time=time_str)
 
     await callback.message.edit_text(
-        "👤 *Ismingizni kiriting:*\n\n"
-        "_(To'liq ism sharifingizni yozing)_",
-        parse_mode="Markdown"
+        "👤 Ismingizni kiriting:\n\n"
+        "(To'liq ism sharifingizni yozing)",
     )
     await state.set_state(BookingState.entering_name)
 
@@ -155,12 +148,11 @@ async def name_entered(message: Message, state: FSMContext):
     await state.update_data(patient_name=name)
 
     await message.answer(
-        f"✅ Ism: *{name}*\n\n"
-        f"📞 *Telefon raqamingizni kiriting:*\n"
-        f"_(Misol: +998901234567)_\n\n"
+        f"✅ Ism: {name}\n\n"
+        f"📞 Telefon raqamingizni kiriting:\n"
+        f"(Misol: +998901234567)\n\n"
         f"Yoki tugmani bosing:",
         reply_markup=phone_keyboard(),
-        parse_mode="Markdown"
     )
     await state.set_state(BookingState.entering_phone)
 
@@ -183,8 +175,7 @@ async def phone_entered(message: Message, state: FSMContext):
     if not (phone.startswith("+998") or phone.startswith("998") or phone.startswith("0")):
         await message.answer(
             "❌ Noto'g'ri format. Iltimos qaytadan kiriting:\n"
-            "_(Misol: +998901234567 yoki 901234567)_",
-            parse_mode="Markdown"
+            "(Misol: +998901234567 yoki 901234567)",
         )
         return
 
@@ -205,12 +196,12 @@ async def process_phone(message: Message, state: FSMContext, phone: str):
 
     # Tasdiqlash xabari
     confirm_text = (
-        f"📋 *Navbat ma'lumotlari:*\n\n"
-        f"👨‍⚕️ Shifokor: *{data['doctor_name']}*\n"
-        f"📅 Sana: *{chosen_date.strftime('%d.%m.%Y')}*\n"
-        f"🕐 Vaqt: *{data['chosen_time']}*\n"
-        f"👤 Ism: *{data['patient_name']}*\n"
-        f"📞 Telefon: *{phone}*\n\n"
+        f"📋 Navbat ma'lumotlari:\n\n"
+        f"👨‍⚕️ Shifokor: {data['doctor_name']}\n"
+        f"📅 Sana: {chosen_date.strftime('%d.%m.%Y')}\n"
+        f"🕐 Vaqt: {data['chosen_time']}\n"
+        f"👤 Ism: {data['patient_name']}\n"
+        f"📞 Telefon: {phone}\n\n"
         f"Ma'lumotlar to'g'rimi?"
     )
 
@@ -223,7 +214,6 @@ async def process_phone(message: Message, state: FSMContext, phone: str):
     await message.answer(
         confirm_text,
         reply_markup=builder.as_markup(),
-        parse_mode="Markdown"
     )
     # Telefon klaviaturasini yashirish
     await message.answer("👆 Yuqoridagi tugmalardan birini tanlang.",
@@ -254,15 +244,15 @@ async def confirm_appointment(callback: CallbackQuery, state: FSMContext):
         return
 
     success_text = (
-        f"🎉 *Navbat muvaffaqiyatli saqlandi!*\n\n"
+        f"🎉 Navbat muvaffaqiyatli saqlandi!\n\n"
         f"━━━━━━━━━━━━━━━━━━\n"
-        f"🆔 Navbat №: *{appointment.id}*\n"
-        f"👨‍⚕️ Shifokor: *{appointment.doctor_name}*\n"
-        f"🩺 Mutaxassis: *{appointment.doctor_specialty}*\n"
-        f"📅 Sana: *{chosen_date.strftime('%d.%m.%Y')}*\n"
-        f"🕐 Vaqt: *{data['chosen_time']}*\n"
+        f"🆔 Navbat №: {appointment.id}\n"
+        f"👨‍⚕️ Shifokor: {appointment.doctor_name}\n"
+        f"🩺 Mutaxassis: {appointment.doctor_specialty}\n"
+        f"📅 Sana: {chosen_date.strftime('%d.%m.%Y')}\n"
+        f"🕐 Vaqt: {data['chosen_time']}\n"
         f"━━━━━━━━━━━━━━━━━━\n"
-        f"📍 *Manzil:* {CLINIC_ADDRESS}\n\n"
+        f"📍 Manzil: {CLINIC_ADDRESS}\n\n"
         f"🔔 Navbatdan 24 soat va 1 soat oldin eslatma yuboriladi.\n\n"
         f"_Navbatni bekor qilish uchun /my_appointments_"
     )
@@ -270,7 +260,6 @@ async def confirm_appointment(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
         success_text,
         reply_markup=main_menu_keyboard(),
-        parse_mode="Markdown"
     )
     await state.clear()
 
@@ -281,11 +270,10 @@ async def confirm_appointment(callback: CallbackQuery, state: FSMContext):
         try:
             await bot.send_message(
                 admin_id,
-                f"🆕 *Yangi navbat!*\n\n"
+                f"🆕 Yangi navbat!\n\n"
                 f"👤 {appointment.patient_name} ({appointment.patient_phone})\n"
                 f"👨‍⚕️ {appointment.doctor_name}\n"
                 f"📅 {chosen_date.strftime('%d.%m.%Y')} soat {data['chosen_time']}",
-                parse_mode="Markdown"
             )
         except:
             pass
@@ -319,10 +307,9 @@ async def show_my_appointments(update, state: FSMContext):
         return
 
     await edit(
-        f"🗓 *Sizning navbatlaringiz* ({len(appointments)} ta):\n\n"
+        f"🗓 Sizning navbatlaringiz ({len(appointments)} ta):\n\n"
         f"Navbat haqida batafsil ko'rish uchun tanlang:",
         reply_markup=my_appointments_keyboard(appointments),
-        parse_mode="Markdown"
     )
 
 
@@ -343,18 +330,17 @@ async def appointment_detail(callback: CallbackQuery):
     apt_date = apt.appointment_datetime
     text = (
         f"📋 *Navbat №{apt.id}*\n\n"
-        f"👨‍⚕️ *Shifokor:* {apt.doctor_name}\n"
-        f"🩺 *Mutaxassis:* {apt.doctor_specialty}\n"
-        f"📅 *Sana:* {apt_date.strftime('%d.%m.%Y')}\n"
-        f"🕐 *Vaqt:* {apt_date.strftime('%H:%M')}\n"
-        f"📍 *Manzil:* {CLINIC_ADDRESS}\n\n"
+        f"👨‍⚕️ Shifokor: {apt.doctor_name}\n"
+        f"🩺 Mutaxassis: {apt.doctor_specialty}\n"
+        f"📅 Sana: {apt_date.strftime('%d.%m.%Y')}\n"
+        f"🕐 Vaqt: {apt_date.strftime('%H:%M')}\n"
+        f"📍 Manzil: {CLINIC_ADDRESS}\n\n"
         f"_Navbatni bekor qilish uchun quyidagi tugmani bosing._"
     )
 
     await callback.message.edit_text(
         text,
         reply_markup=appointment_detail_keyboard(apt.id),
-        parse_mode="Markdown"
     )
 
 
@@ -376,10 +362,9 @@ async def cancel_patient_appointment(callback: CallbackQuery):
             try:
                 await callback.bot.send_message(
                     admin_id,
-                    f"❌ *Navbat bekor qilindi!*\n"
+                    f"❌ Navbat bekor qilindi!\n"
                     f"Navbat №{apt_id}\n"
                     f"Mijoz: {callback.from_user.full_name}",
-                    parse_mode="Markdown"
                 )
             except:
                 pass
