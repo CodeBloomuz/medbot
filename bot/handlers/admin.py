@@ -43,17 +43,17 @@ async def admin_statistics(callback: CallbackQuery):
     builder.adjust(2)
 
     text = (
-        f"📊 *Statistika*\n\n"
+        f"📊 Statistika\n\n"
         f"━━━━━━━━━━━━━━━━━━\n"
-        f"📋 Jami navbatlar: *{stats['total']}*\n"
-        f"📅 Bugungi navbatlar: *{stats['today']}*\n"
-        f"⏳ Kutilayotgan: *{stats['upcoming']}*\n"
-        f"❌ Bu oy bekor qilingan: *{stats['cancelled_month']}*\n"
+        f"📋 Jami navbatlar: {stats['total']}\n"
+        f"📅 Bugungi navbatlar: {stats['today']}\n"
+        f"⏳ Kutilayotgan: {stats['upcoming']}\n"
+        f"❌ Bu oy bekor qilingan: {stats['cancelled_month']}\n"
         f"━━━━━━━━━━━━━━━━━━\n"
         f"🕐 {datetime.now().strftime('%d.%m.%Y %H:%M')}"
     )
 
-    await callback.message.edit_text(text, reply_markup=builder.as_markup(), parse_mode="Markdown")
+    await callback.message.edit_text(text, reply_markup=builder.as_markup())
 
 
 @router.callback_query(F.data == "admin_today")
@@ -72,14 +72,13 @@ async def admin_today_appointments(callback: CallbackQuery):
 
     if not appointments:
         await callback.message.edit_text(
-            f"📅 *Bugungi navbatlar*\n\n"
+            f"📅 Bugungi navbatlar\n\n"
             f"Hozircha bugungi navbatlar yo'q.",
             reply_markup=builder.as_markup(),
-            parse_mode="Markdown"
         )
         return
 
-    text = f"📅 *Bugungi navbatlar* ({len(appointments)} ta)\n\n"
+    text = f"📅 Bugungi navbatlar ({len(appointments)} ta)\n\n"
     for i, apt in enumerate(appointments, 1):
         time_str = apt.appointment_datetime.strftime("%H:%M")
         text += (
@@ -93,7 +92,7 @@ async def admin_today_appointments(callback: CallbackQuery):
     if len(text) > 4000:
         text = text[:4000] + "\n...(qolganlar)"
 
-    await callback.message.edit_text(text, reply_markup=builder.as_markup(), parse_mode="Markdown")
+    await callback.message.edit_text(text, reply_markup=builder.as_markup())
 
 
 @router.callback_query(F.data == "admin_doctors")
@@ -119,11 +118,10 @@ async def admin_doctors(callback: CallbackQuery):
     builder.adjust(1)
 
     await callback.message.edit_text(
-        "👨‍⚕️ *Shifokorlar ro'yxati*\n\n"
+        "👨‍⚕️ Shifokorlar ro'yxati\n\n"
         "✅ = Faol | ❌ = Nofaol\n"
         "O'zgartirish uchun shifokor ustiga bosing:",
         reply_markup=builder.as_markup(),
-        parse_mode="Markdown"
     )
 
 
@@ -148,10 +146,9 @@ async def start_add_doctor(callback: CallbackQuery, state: FSMContext):
         return
 
     await callback.message.edit_text(
-        "➕ *Yangi shifokor qo'shish*\n\n"
+        "➕ Yangi shifokor qo'shish\n\n"
         "Shifokorning to'liq ismini kiriting:\n"
-        "_(Misol: Karimov Jasur Aliyevich)_",
-        parse_mode="Markdown"
+        "(Misol: Karimov Jasur Aliyevich)",
     )
     await state.set_state(AdminState.adding_doctor_name)
 
@@ -165,7 +162,7 @@ async def doctor_name_entered(message: Message, state: FSMContext):
     await message.answer(
         "✅ Ism saqlandi.\n\n"
         "Mutaxassisligini kiriting:\n"
-        "_(Misol: Kardiolog, Terapevt, Stomatolog)_"
+        "(Misol: Kardiolog, Terapevt, Stomatolog)"
     )
     await state.set_state(AdminState.adding_doctor_specialty)
 
@@ -199,11 +196,10 @@ async def doctor_emoji_entered(message: Message, state: FSMContext):
     )
 
     await message.answer(
-        f"✅ *Shifokor muvaffaqiyatli qo'shildi!*\n\n"
+        f"✅ Shifokor muvaffaqiyatli qo'shildi!\n\n"
         f"{emoji} {doctor.name}\n"
         f"🩺 {doctor.specialty}",
         reply_markup=admin_menu_keyboard(),
-        parse_mode="Markdown"
     )
     await state.clear()
 
@@ -221,11 +217,10 @@ async def start_broadcast(callback: CallbackQuery, state: FSMContext):
     builder.button(text="❌ Bekor qilish", callback_data="back_admin")
 
     await callback.message.edit_text(
-        "📢 *Barcha mijozlarga xabar yuborish*\n\n"
+        "📢 Barcha mijozlarga xabar yuborish\n\n"
         "Yubormoqchi bo'lgan xabaringizni yozing:\n"
-        "_(Markdown format qo'llab-quvvatlanadi)_",
+        "(Markdown format qo'llab-quvvatlanadi)",
         reply_markup=builder.as_markup(),
-        parse_mode="Markdown"
     )
     await state.set_state(AdminState.broadcast_message)
 
@@ -258,18 +253,16 @@ async def send_broadcast(message: Message, state: FSMContext):
             await message.bot.send_message(
                 user_id,
                 f"📢 *{message.bot.username} dan xabar:*\n\n{broadcast_text}",
-                parse_mode="Markdown"
             )
             sent += 1
         except Exception:
             failed += 1
 
     await message.answer(
-        f"✅ *Xabar yuborish yakunlandi!*\n\n"
+        f"✅ Xabar yuborish yakunlandi!\n\n"
         f"✅ Yuborildi: {sent} ta\n"
         f"❌ Yuborilmadi: {failed} ta",
         reply_markup=admin_menu_keyboard(),
-        parse_mode="Markdown"
     )
 
 
@@ -277,7 +270,6 @@ async def send_broadcast(message: Message, state: FSMContext):
 async def back_to_admin(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     await callback.message.edit_text(
-        "⚙️ *Admin panel*",
+        "⚙️ Admin panel",
         reply_markup=admin_menu_keyboard(),
-        parse_mode="Markdown"
     )
