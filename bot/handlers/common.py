@@ -15,8 +15,8 @@ async def cmd_start(message: Message, state: FSMContext):
     name = message.from_user.first_name or "Mehmon"
 
     text = (
-        f"👋 Assalomu alaykum, *{name}*!\n\n"
-        f"🏥 *{CLINIC_NAME}* Telegram botiga xush kelibsiz!\n\n"
+        f"👋 Assalomu alaykum, {name}!\n\n"
+        f"🏥 {CLINIC_NAME} Telegram botiga xush kelibsiz!\n\n"
         f"Bu bot orqali siz:\n"
         f"✅ Shifokorga navbat olishingiz\n"
         f"📋 Navbatlaringizni ko'rishingiz\n"
@@ -24,7 +24,7 @@ async def cmd_start(message: Message, state: FSMContext):
         f"Quyidan kerakli bo'limni tanlang:"
     )
 
-    await message.answer(text, reply_markup=main_menu_keyboard(), parse_mode="Markdown")
+    await message.answer(text, reply_markup=main_menu_keyboard())
 
 
 @router.message(Command("menu"))
@@ -52,17 +52,16 @@ async def clinic_info(callback: CallbackQuery):
     builder.button(text="⬅️ Orqaga", callback_data="main_menu")
 
     text = (
-        f"🏥 *{CLINIC_NAME}*\n\n"
-        f"📍 *Manzil:* {CLINIC_ADDRESS}\n"
-        f"📞 *Telefon:* {CLINIC_PHONE}\n"
-        f"🕐 *Ish vaqti:* Dush-Jum 09:00 - 18:00\n\n"
+        f"🏥 {CLINIC_NAME}\n\n"
+        f"📍 Manzil: {CLINIC_ADDRESS}\n"
+        f"📞 Telefon: {CLINIC_PHONE}\n"
+        f"🕐 Ish vaqti: Dush-Jum 09:00 - 18:00\n\n"
         f"Navbat olish uchun '📋 Navbat olish' tugmasini bosing."
     )
 
     await callback.message.edit_text(
         text,
         reply_markup=builder.as_markup(),
-        parse_mode="Markdown"
     )
 
 
@@ -90,7 +89,6 @@ async def admin_command(message: Message):
         return
     from bot.keyboards import admin_menu_keyboard
     await message.answer(
-        "⚙️ *Admin panel*\n\nKerakli bo'limni tanlang:",
+        "⚙️ Admin panel\n\nKerakli bo'limni tanlang:",
         reply_markup=admin_menu_keyboard(),
-        parse_mode="Markdown"
     )
